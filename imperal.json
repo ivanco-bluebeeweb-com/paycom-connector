@@ -1,0 +1,2189 @@
+{
+  "manifest_schema_version": 3,
+  "sdk_version": "5.13.1",
+  "app_id": "paycom-connector",
+  "version": "0.1.0",
+  "name": "Paycom",
+  "description": "Official Imperal connector for Paycom (C28. Payroll & Benefits Administration). Full CRUD on core entities, webhooks, and compliance audits.",
+  "icon": "icon.svg",
+  "actions_explicit": true,
+  "system": false,
+  "capabilities": [
+    "paycom:manage"
+  ],
+  "tools": [
+    {
+      "name": "connect_paycom",
+      "description": "Connect Paycom account via credentials.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "label": {
+            "default": "",
+            "description": "Friendly connection label, e.g. Acme Paycom.",
+            "title": "Label",
+            "type": "string"
+          },
+          "api_token": {
+            "description": "Payroll API Token or OAuth Access Token.",
+            "title": "Api Token",
+            "type": "string"
+          },
+          "base_url": {
+            "default": "",
+            "description": "Optional custom base URL or instance domain.",
+            "title": "Base Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_token"
+        ],
+        "title": "ConnectParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "label": {
+            "default": "",
+            "description": "Friendly connection label, e.g. Acme Paycom.",
+            "title": "Label",
+            "type": "string"
+          },
+          "api_token": {
+            "description": "Payroll API Token or OAuth Access Token.",
+            "title": "Api Token",
+            "type": "string"
+          },
+          "base_url": {
+            "default": "",
+            "description": "Optional custom base URL or instance domain.",
+            "title": "Base Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_token"
+        ],
+        "title": "ConnectParams",
+        "type": "object"
+      },
+      "event": "paycom-connector.connect_paycom",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_connections",
+      "description": "List connected Paycom accounts.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "description": "Empty parameter model.",
+        "properties": {},
+        "title": "NoParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "description": "Empty parameter model.",
+        "properties": {},
+        "title": "NoParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "disconnect_paycom",
+      "description": "Disconnect Paycom account.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "event": "paycom-connector.disconnect_paycom",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_employees",
+      "description": "List employees (Worker identity, employment details and compensation).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListEmployeeParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListEmployeeParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_employee",
+      "description": "Read details of one employee.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "GetEmployeeParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "GetEmployeeParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_employee",
+      "description": "Create a new employee.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateEmployeeParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateEmployeeParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_employee",
+      "description": "Update an existing employee.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "employee_id",
+          "fields"
+        ],
+        "title": "UpdateEmployeeParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "employee_id",
+          "fields"
+        ],
+        "title": "UpdateEmployeeParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_employee",
+      "description": "Permanently delete a employee.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "DeleteEmployeeParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "employee_id": {
+            "description": "Unique identifier of the employee.",
+            "title": "Employee Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_id"
+        ],
+        "title": "DeleteEmployeeParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_payroll_runs",
+      "description": "List payroll_runs (Executed or scheduled payroll cycle batch).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListPayrollRunParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListPayrollRunParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_payroll_run",
+      "description": "Read details of one payroll_run.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payroll_run_id"
+        ],
+        "title": "GetPayrollRunParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payroll_run_id"
+        ],
+        "title": "GetPayrollRunParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_payroll_run",
+      "description": "Create a new payroll_run.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreatePayrollRunParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreatePayrollRunParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_payroll_run",
+      "description": "Update an existing payroll_run.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "payroll_run_id",
+          "fields"
+        ],
+        "title": "UpdatePayrollRunParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "payroll_run_id",
+          "fields"
+        ],
+        "title": "UpdatePayrollRunParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_payroll_run",
+      "description": "Permanently delete a payroll_run.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payroll_run_id"
+        ],
+        "title": "DeletePayrollRunParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "payroll_run_id": {
+            "description": "Unique identifier of the payroll_run.",
+            "title": "Payroll Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payroll_run_id"
+        ],
+        "title": "DeletePayrollRunParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_departments",
+      "description": "List departments (Organizational department and cost center).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListDepartmentParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListDepartmentParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_department",
+      "description": "Read details of one department.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "department_id"
+        ],
+        "title": "GetDepartmentParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "department_id"
+        ],
+        "title": "GetDepartmentParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_department",
+      "description": "Create a new department.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateDepartmentParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateDepartmentParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_department",
+      "description": "Update an existing department.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "department_id",
+          "fields"
+        ],
+        "title": "UpdateDepartmentParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "department_id",
+          "fields"
+        ],
+        "title": "UpdateDepartmentParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_department",
+      "description": "Permanently delete a department.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "department_id"
+        ],
+        "title": "DeleteDepartmentParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "department_id": {
+            "description": "Unique identifier of the department.",
+            "title": "Department Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "department_id"
+        ],
+        "title": "DeleteDepartmentParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_time_off_requests",
+      "description": "List time_off_requests (Leave and PTO balance request).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListTimeOffRequestParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListTimeOffRequestParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_time_off_request",
+      "description": "Read details of one time_off_request.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time_off_request_id"
+        ],
+        "title": "GetTimeOffRequestParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time_off_request_id"
+        ],
+        "title": "GetTimeOffRequestParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_time_off_request",
+      "description": "Create a new time_off_request.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateTimeOffRequestParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateTimeOffRequestParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_time_off_request",
+      "description": "Update an existing time_off_request.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "time_off_request_id",
+          "fields"
+        ],
+        "title": "UpdateTimeOffRequestParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "time_off_request_id",
+          "fields"
+        ],
+        "title": "UpdateTimeOffRequestParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_time_off_request",
+      "description": "Permanently delete a time_off_request.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time_off_request_id"
+        ],
+        "title": "DeleteTimeOffRequestParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "time_off_request_id": {
+            "description": "Unique identifier of the time_off_request.",
+            "title": "Time Off Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time_off_request_id"
+        ],
+        "title": "DeleteTimeOffRequestParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_benefit_plans",
+      "description": "List benefit_plans (Company healthcare and benefits package).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListBenefitPlanParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListBenefitPlanParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_benefit_plan",
+      "description": "Read details of one benefit_plan.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "benefit_plan_id"
+        ],
+        "title": "GetBenefitPlanParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "benefit_plan_id"
+        ],
+        "title": "GetBenefitPlanParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_benefit_plan",
+      "description": "Create a new benefit_plan.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateBenefitPlanParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateBenefitPlanParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_benefit_plan",
+      "description": "Update an existing benefit_plan.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "benefit_plan_id",
+          "fields"
+        ],
+        "title": "UpdateBenefitPlanParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "benefit_plan_id",
+          "fields"
+        ],
+        "title": "UpdateBenefitPlanParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_benefit_plan",
+      "description": "Permanently delete a benefit_plan.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "benefit_plan_id"
+        ],
+        "title": "DeleteBenefitPlanParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "benefit_plan_id": {
+            "description": "Unique identifier of the benefit_plan.",
+            "title": "Benefit Plan Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "benefit_plan_id"
+        ],
+        "title": "DeleteBenefitPlanParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "list_direct_deposits",
+      "description": "List direct_deposits (Employee bank routing disbursement setting).",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListDirectDepositParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max records to return (1-100).",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "cursor": {
+            "default": "",
+            "description": "Pagination cursor or page token.",
+            "title": "Cursor",
+            "type": "string"
+          }
+        },
+        "title": "ListDirectDepositParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_direct_deposit",
+      "description": "Read details of one direct_deposit.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direct_deposit_id"
+        ],
+        "title": "GetDirectDepositParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direct_deposit_id"
+        ],
+        "title": "GetDirectDepositParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "create_direct_deposit",
+      "description": "Create a new direct_deposit.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateDirectDepositParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name or title of the record.",
+            "title": "Name",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Detailed attributes and payload.",
+            "title": "Details"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateDirectDepositParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "update_direct_deposit",
+      "description": "Update an existing direct_deposit.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "direct_deposit_id",
+          "fields"
+        ],
+        "title": "UpdateDirectDepositParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": true,
+            "description": "Attributes to update.",
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "required": [
+          "direct_deposit_id",
+          "fields"
+        ],
+        "title": "UpdateDirectDepositParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "delete_direct_deposit",
+      "description": "Permanently delete a direct_deposit.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direct_deposit_id"
+        ],
+        "title": "DeleteDirectDepositParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "direct_deposit_id": {
+            "description": "Unique identifier of the direct_deposit.",
+            "title": "Direct Deposit Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "direct_deposit_id"
+        ],
+        "title": "DeleteDirectDepositParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "audit_payroll_compliance",
+      "description": "Value-add audit: Audit worker onboarding completeness, tax filings and missing info.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    },
+    {
+      "name": "get_headcount_summary",
+      "description": "Value-add audit: Summary of active headcount by department and location.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Connection identifier (empty uses active connection).",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionIdParams",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_paycom-connector_chat"
+    }
+  ],
+  "signals": [],
+  "schedules": [],
+  "required_scopes": [],
+  "icon_size_bytes": 541,
+  "lifecycle": {
+    "health_check": {
+      "interval_sec": 60
+    }
+  },
+  "panels": [
+    {
+      "panel_id": "paycom_sidebar",
+      "slot": "left",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    },
+    {
+      "panel_id": "__paycom_settings",
+      "slot": "center",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    }
+  ],
+  "pricing": {
+    "model": "per_action",
+    "currency": "tokens",
+    "monthly_price": 0,
+    "revenue_split_dev": 70,
+    "free_tools": [
+      "connect_paycom",
+      "list_connections",
+      "disconnect_paycom"
+    ],
+    "tool_prices": {
+      "connect_paycom": 0,
+      "list_connections": 0,
+      "disconnect_paycom": 0,
+      "list_employees": 8,
+      "get_employee": 8,
+      "create_employee": 16,
+      "update_employee": 16,
+      "delete_employee": 16,
+      "list_payroll_runs": 8,
+      "get_payroll_run": 8,
+      "create_payroll_run": 16,
+      "update_payroll_run": 16,
+      "delete_payroll_run": 16,
+      "list_departments": 8,
+      "get_department": 8,
+      "create_department": 16,
+      "update_department": 16,
+      "delete_department": 16,
+      "list_time_off_requests": 8,
+      "get_time_off_request": 8,
+      "create_time_off_request": 16,
+      "update_time_off_request": 16,
+      "delete_time_off_request": 16,
+      "list_benefit_plans": 8,
+      "get_benefit_plan": 8,
+      "create_benefit_plan": 16,
+      "update_benefit_plan": 16,
+      "delete_benefit_plan": 16,
+      "list_direct_deposits": 8,
+      "get_direct_deposit": 8,
+      "create_direct_deposit": 16,
+      "update_direct_deposit": 16,
+      "delete_direct_deposit": 16,
+      "audit_payroll_compliance": 40,
+      "get_headcount_summary": 40
+    },
+    "notes": "Canonical pricing aligned with PRICING_POLICY.md (standard scale 0/8/16/20/40/60)."
+  }
+}
