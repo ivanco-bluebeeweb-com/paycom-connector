@@ -56,7 +56,6 @@ async def paycom_sidebar(ctx, **kwargs) -> ui.UINode:
                             ui.Input(
                                 param_name="api_token",
                                 placeholder="Enter Paycom API Token",
-                                type="password",
                                 value=""
                             ),
                             ui.Text("Client Code", variant="caption"),
