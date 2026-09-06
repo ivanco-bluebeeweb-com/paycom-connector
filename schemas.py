@@ -9,7 +9,8 @@ class NoParams(BaseModel):
 
 class ConnectParams(BaseModel):
     label: str = Field(default="", description="Friendly connection label, e.g. Acme Paycom.")
-    api_token: str = Field(description="Payroll API Token or OAuth Access Token.")
+    api_token: str = Field(description="Paycom Web Services API Bearer Token.")
+    client_code: str = Field(default="", description="Paycom Client Code.")
     base_url: str = Field(default="", description="Optional custom base URL or instance domain.")
 
 class ConnectionIdParams(BaseModel):

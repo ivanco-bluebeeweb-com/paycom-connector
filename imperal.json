@@ -14,7 +14,7 @@
   "tools": [
     {
       "name": "connect_paycom",
-      "description": "Connect Paycom account via credentials.",
+      "description": "Connect your own Paycom account with API Token and Client Code.",
       "action_type": "write",
       "chain_callable": true,
       "effects": [
@@ -30,19 +30,25 @@
             "type": "string"
           },
           "api_token": {
-            "description": "Payroll API Token or OAuth Access Token.",
+            "description": "Paycom Web Services API Bearer Token.",
             "title": "Api Token",
+            "type": "string"
+          },
+          "client_code": {
+            "description": "Paycom Client Code (e.g. ACM01).",
+            "title": "Client Code",
             "type": "string"
           },
           "base_url": {
             "default": "",
-            "description": "Optional custom base URL or instance domain.",
+            "description": "Optional custom base URL (defaults to https://api.paycom.com).",
             "title": "Base Url",
             "type": "string"
           }
         },
         "required": [
-          "api_token"
+          "api_token",
+          "client_code"
         ],
         "title": "ConnectParams",
         "type": "object"

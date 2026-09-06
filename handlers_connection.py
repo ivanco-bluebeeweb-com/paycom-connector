@@ -39,58 +39,107 @@ async def resolve_connection(ctx, connection_id: str = "") -> dict | None:
 
 @chat.function(
     "connect_paycom",
-    "Connect Paycom account via credentials.",
+    "Connect your own Paycom account with API Token and Client Code.",
     action_type="write",
     chain_callable=True,
     event="paycom-connector.connect_paycom",
     effects=["create:connection"],
     data_model=ConnectParams
 )
-async def connect_paycom(params: ConnectParams, ctx) -> ActionResult[ConnectionRecord]:
-    client = PaycomClient(api_token=params.api_token, base_url=params.base_url)
-    await client.verify_auth()
+async def connect_paycom(ctx, params: ConnectParams) -> ActionResult[ConnectionRecord]:
+    """Connect a new Paycom client."""
+    client = PaycomClient(
+        api_token=params.api_token,
+        client_code=params.client_code,
+        base_url=params.base_url
+    )
+    v_res = await client.verify_auth()
+    if v_res.get("status") == "error":
+        return ActionResult.error(
+            f"Failed to verify Paycom credentials: {v_res.get('message', 'Unknown error')}",
+            code=v_res.get("code", "UNAUTHORIZED")
+        )
+
     conns = await _load_connections(ctx)
-    cid = f"conn_{uuid.uuid4().hex[:8]}"
-    record = {
-        "id": cid,
-        "label": params.label or "Paycom Account",
+    conn_id = f"conn_{uuid.uuid4().hex[:8]}"
+    for c in conns:
+        c["is_active"] = False
+
+    rec = {
+        "id": conn_id,
+        "label": params.label.strip() or f"Paycom ({params.client_code or 'Default'})",
+        "masked_key": _mask(params.api_token),
         "api_token": params.api_token,
-        "base_url": params.base_url,
+        "client_code": params.client_code,
+        "base_url": params.base_url.strip(),
         "is_active": True
     }
-    for c in conns: c["is_active"] = False
-    conns.append(record)
+    conns.append(rec)
     await _save_connections(ctx, conns)
-    return ActionResult.ok(ConnectionRecord(id=cid, label=record["label"], masked_key=_mask(params.api_token), base_url=params.base_url, is_active=True))
+    return ActionResult.ok(
+        ConnectionRecord(
+            id=rec["id"],
+            label=rec["label"],
+            masked_key=rec["masked_key"],
+            client_code=rec["client_code"],
+            base_url=rec["base_url"],
+            is_active=rec["is_active"]
+        ),
+        message=f"Successfully connected Paycom account '{rec['label']}'."
+    )
 
 @chat.function(
     "list_connections",
-    "List connected Paycom accounts.",
+    "List connected Paycom accounts without exposing sensitive tokens.",
     action_type="read",
     chain_callable=True,
+    event="paycom-connector.list_connections",
+    effects=[],
     data_model=NoParams
 )
-async def list_connections(params: NoParams, ctx) -> ActionResult[ConnectionList]:
+async def list_connections(ctx, params: NoParams) -> ActionResult[ConnectionList]:
+    """List all configured Paycom connections."""
     conns = await _load_connections(ctx)
-    records = [ConnectionRecord(id=c["id"], label=c["label"], masked_key=_mask(c.get("api_token", "")), base_url=c.get("base_url", ""), is_active=c.get("is_active", False)) for c in conns]
+    records = [
+        ConnectionRecord(
+            id=c["id"],
+            label=c.get("label", ""),
+            masked_key=c.get("masked_key", "***"),
+            client_code=c.get("client_code", ""),
+            base_url=c.get("base_url", ""),
+            is_active=c.get("is_active", False)
+        )
+        for c in conns
+    ]
     return ActionResult.ok(ConnectionList(connections=records, total=len(records)))
 
 @chat.function(
     "disconnect_paycom",
-    "Disconnect Paycom account.",
+    "Disconnect a Paycom account and delete its saved credentials.",
     action_type="write",
     chain_callable=True,
     event="paycom-connector.disconnect_paycom",
     effects=["delete:connection"],
     data_model=ConnectionIdParams
 )
-async def disconnect_paycom(params: ConnectionIdParams, ctx) -> ActionResult[DeleteResult]:
+async def disconnect_paycom(ctx, params: ConnectionIdParams) -> ActionResult[DeleteResult]:
+    """Disconnect a Paycom account."""
     conns = await _load_connections(ctx)
-    target = await resolve_connection(ctx, params.connection_id)
+    target = params.connection_id.strip()
     if not target:
-        return ActionResult.error("Connection not found", code="NOT_FOUND")
-    new_conns = [c for c in conns if c["id"] != target["id"]]
-    if new_conns and target.get("is_active"):
-        new_conns[0]["is_active"] = True
-    await _save_connections(ctx, new_conns)
-    return ActionResult.ok(DeleteResult(id=target["id"], deleted=True, message="Disconnected successfully"))
+        if conns:
+            target = conns[0]["id"]
+        else:
+            return ActionResult.error("No active Paycom connection to disconnect.", code="NOT_FOUND")
+
+    remaining = [c for c in conns if c["id"] != target]
+    if len(remaining) == len(conns):
+        return ActionResult.error(f"Connection {target} not found.", code="NOT_FOUND")
+
+    if remaining and not any(c.get("is_active") for c in remaining):
+        remaining[0]["is_active"] = True
+
+    await _save_connections(ctx, remaining)
+    return ActionResult.ok(
+        DeleteResult(id=target, deleted=True, message=f"Disconnected Paycom connection {target}.")
+    )
