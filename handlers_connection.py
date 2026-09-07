@@ -76,7 +76,7 @@ async def connect_paycom(ctx, params: ConnectParams) -> ActionResult[ConnectionR
     }
     conns.append(rec)
     await _save_connections(ctx, conns)
-    return ActionResult.ok(
+    return ActionResult.success(
         ConnectionRecord(
             id=rec["id"],
             label=rec["label"],
@@ -85,7 +85,7 @@ async def connect_paycom(ctx, params: ConnectParams) -> ActionResult[ConnectionR
             base_url=rec["base_url"],
             is_active=rec["is_active"]
         ),
-        message=f"Successfully connected Paycom account '{rec['label']}'."
+        message=f"Successfully connected Paycom account '{rec['label']}'.", summary="Paycom connected."
     )
 
 @chat.function(
@@ -111,7 +111,7 @@ async def list_connections(ctx, params: NoParams) -> ActionResult[ConnectionList
         )
         for c in conns
     ]
-    return ActionResult.ok(ConnectionList(connections=records, total=len(records)))
+    return ActionResult.success(ConnectionList(connections=records, total=len(records)), summary="Connections listed.")
 
 @chat.function(
     "disconnect_paycom",
@@ -140,6 +140,6 @@ async def disconnect_paycom(ctx, params: ConnectionIdParams) -> ActionResult[Del
         remaining[0]["is_active"] = True
 
     await _save_connections(ctx, remaining)
-    return ActionResult.ok(
-        DeleteResult(id=target, deleted=True, message=f"Disconnected Paycom connection {target}.")
+    return ActionResult.success(
+        DeleteResult(id=target, deleted=True, message=f"Disconnected Paycom connection {target}."), summary="Paycom disconnected."
     )
