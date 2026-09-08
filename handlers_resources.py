@@ -11,7 +11,7 @@ async def _get_client(ctx, cid: str = ""):
     conn = await resolve_connection(ctx, cid)
     if not conn:
         return None, ActionResult.error("No active Paycom connection", code="UNAUTHORIZED")
-    return PaycomClient(api_token=conn["api_token"], base_url=conn.get("base_url", "")), None
+    return PaycomClient(api_token=conn["api_token"], client_code=conn.get("client_code", ""), base_url=conn.get("base_url", "")), None
 
 @chat.function(
     "list_employees",

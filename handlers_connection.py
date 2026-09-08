@@ -85,7 +85,7 @@ async def connect_paycom(ctx, params: ConnectParams) -> ActionResult[ConnectionR
             base_url=rec["base_url"],
             is_active=rec["is_active"]
         ),
-        message=f"Successfully connected Paycom account '{rec['label']}'.", summary="Paycom connected."
+        summary="Paycom connected."
     )
 
 @chat.function(
